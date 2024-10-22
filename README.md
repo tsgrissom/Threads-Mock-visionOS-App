@@ -1,6 +1,6 @@
-#  ThreadsForVisionOS
+#  Mock Threads App for visionOS
 
-ThreadsForVisionOS is a mockup of how Meta's Threads platform might look when it is brought to Apple's visionOS platform.
+This is a SwiftUI mockup of how Meta's Threads platform might look when it is brought to Apple's visionOS platform.
 
 <img src="https://i.ibb.co/FnhYbHx/New-Thread-Living-Room-Dark.jpg" alt="New-Thread-Living-Room-Dark" border="0">
 <img src="https://i.ibb.co/xXWt7jd/Threads-Profile-Kitchen-Day.jpg" alt="Threads-Profile-Kitchen-Day" border="0">
