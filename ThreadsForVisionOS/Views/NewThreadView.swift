@@ -3,22 +3,67 @@ import SwiftUI
 struct NewThreadView: View {
     
     let visibilityOptions: [String] = ["Anyone can reply", "Profiles you follow", "Mentioned only"]
+    let username: String
+    let leftPaneWidth: CGFloat = 400
+    let rightPaneWidth: CGFloat = 200
     
     @State private var initialPostText: String = ""
     @State private var subsequentPostText: String = ""
     @State private var postVisibility: String = "Anyone can reply"
     
+    init(username: String = MockupUtilities.getMockUsername()) {
+        self.username = username
+    }
+    
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             leftPane
-                .frame(width: 400)
-                .padding(EdgeInsets(top: 15, leading: 25, bottom: 0, trailing: 0))
+                .frame(width: leftPaneWidth)
+                .padding(.top, 15)
+                .padding(.leading, 35)
+                .scrollIndicators(.hidden)
+                .scrollClipDisabled()
             rightPane
-                .frame(width: 180)
-                .padding(EdgeInsets(top: 15, leading: 0, bottom: 0, trailing: 0))
+                .frame(width: rightPaneWidth)
+                .padding(.top, 15)
+                .padding(.leading, 5)
             Spacer()
         }
         .navigationTitle("New thread")
+    }
+    
+    private var leftPane: some View {
+        let spacerHeight: CGFloat = 175
+        return ScrollView {
+            VStack {
+                ZStack {
+                    VStack(spacing: 0) {
+                        initialPostRow
+                        Spacer()
+                            .frame(height: spacerHeight)
+                        HStack {
+                            subsequentPostRow
+                                .padding(.top, 35)
+                                .padding(.leading, 25)
+                        }
+                        .frame(width: leftPaneWidth + 50)
+                        .scrollIndicators(.hidden)
+                        .padding(.top, 45)
+                    }
+                    // Vertical divider & attach button overlayed via ZStack for perfect alignment
+                    interThreadRow
+                        .padding(.leading, 34)
+                        .offset(y: 42)
+                }
+            }
+        }
+    }
+    
+    private var rightPane: some View {
+        return HStack {
+            postSettingsSection
+            Spacer()
+        }
     }
 }
 
@@ -35,99 +80,112 @@ extension NewThreadView {
         self.postVisibility = visibilityOptions[ind]
     }
     
-    private var leftPane: some View {
-        return VStack {
-            VStack {
-                initialPostRow
-                interThreadRow
-                    .padding(EdgeInsets(top: 0, leading: 45, bottom: 0, trailing: 0))
-                ScrollView {
-                    subsequentPostRow
-                        .padding(EdgeInsets(top: 1, leading: 36, bottom: 0, trailing: 0))
-                }
-                .scrollIndicators(.hidden)
-            }
-            Spacer()
-        }
-    }
-    
-    private var rightPane: some View {
-        return VStack {
-            postSettingsSection
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 20, trailing: 0))
-            Spacer()
-        }
-    }
-    
     private var initialPostRow: some View {
         let promptText: Text = Text("Start a thread...")
-            .foregroundStyle(.gray)
+            .foregroundStyle(.white)
         
         return HStack {
-            ProfilePictureView(disableAnimation: true, frameDimension: 85)
+            ProfilePictureView(disableAnimation: true, frameDimension: 65)
+                .offset(y: -5)
             VStack {
                 HStack {
-                    Text("username")
+                    Text(username)
                         .bold()
                     Spacer()
                 }
-                TextField(text: $initialPostText, prompt: promptText, label: {
-                    
-                })
+                HStack {
+                    TextField("First post", text: $initialPostText,
+                              prompt: promptText,
+                              axis: .vertical)
+                        .textFieldStyle(.plain)
+                        .background(.thinMaterial)
+                        .cornerRadius(5)
+                        .lineLimit(3...10)
+                        .foregroundStyle(.black)
+                        .frame(width: 275)
+                    Spacer()
+                }
             }
         }
     }
     
     private var interThreadRow: some View {
         return HStack {
+            // Vertical divider
             RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
-                .fill(Color.gray)
-                .frame(width: 3, height: 100)
+                .fill(.white)
+                .frame(width: 3, height: 225)
+                .offset(y: -37)
             Button(action: {
                 
             }) {
                 Image(systemName: "paperclip")
             }
-            .padding(EdgeInsets(top: 0, leading: 35, bottom: 0, trailing: 0))
+            .buttonStyle(MetaButtonStyle())
+            .padding(.leading, 28)
+            .padding(.bottom, 55)
             Spacer()
         }
     }
     
     private var subsequentPostRow: some View {
         let promptText: Text = Text("Add to thread")
-            .foregroundStyle(.gray)
+            .foregroundStyle(.white)
         
         return HStack {
-            Image(systemName: "plus.square")
-                .font(.system(size: 20))
-            TextField(text: $subsequentPostText, prompt: promptText, label: {
-                
-            })
-            .foregroundStyle(.black)
-            .padding(EdgeInsets(top: 0, leading: 25.5, bottom: 0, trailing: 0))
+            VStack {
+                Image(systemName: "plus.square.fill")
+                    .font(.system(size: 20))
+                    .padding(.top, 2)
+                Spacer()
+            }
+            TextField("Subsequent post", text: $subsequentPostText, prompt: promptText, axis: .vertical)
+                .background(.thinMaterial)
+            .cornerRadius(5)
+            .lineLimit(3...10)
+            .foregroundStyle(.white)
+            .padding(.leading, 18)
+            .frame(width: 300)
+            .textFieldStyle(.roundedBorder)
             Spacer()
         }
     }
     
     private var postSettingsSection: some View {
-        return VStack(alignment: .leading) {
-            Button(action: {
-                self.cycleVisibility()
-            }) {
-                Text(self.postVisibility)
-                    .foregroundStyle(.gray)
-                    .frame(width: 160, alignment: .leading)
+        return VStack(spacing: 0) {
+            HStack {
+                Text("Post Settings")
+                    .font(.title3)
+                Spacer()
             }
-            .buttonStyle(.plain)
-            .padding(EdgeInsets(top: 16, leading: 0, bottom: 0, trailing: 0))
-            Button(action: {
-                
-            }) {
-                Text("Post")
-                    .bold()
-                    .foregroundStyle(.blue)
+            .padding(.bottom, 10)
+            
+            HStack {
+                Button(action: {
+                    self.cycleVisibility()
+                }) {
+                    Text(self.postVisibility)
+                        .font(.system(size: 20))
+                        .foregroundStyle(.white)
+                        .frame(width: 160, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                Spacer()
             }
-            .buttonStyle(.plain)
+            .padding(.bottom, 3)
+            
+            HStack {
+                Button(action: {
+                    
+                }) {
+                    Text("Post")
+                        .font(.system(size: 20))
+                        .bold()
+                        .foregroundStyle(.blue)
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
             Spacer()
         }
     }
@@ -136,7 +194,7 @@ extension NewThreadView {
 #Preview {
     ZStack {
         RoundedRectangle(cornerRadius: 30)
-            .fill(.black.opacity(0.8))
+            .fill(.black.opacity(0.9))
         NewThreadView()
     }
 }

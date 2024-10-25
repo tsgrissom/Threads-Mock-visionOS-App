@@ -1,7 +1,10 @@
 import SwiftUI
 
+import LoremSwiftum
+
 struct AULikedView: View {
     
+    let maxFrameWidth: CGFloat = 375
     let username: String
     let likedPostText: String
     let timeDifference: String
@@ -16,7 +19,7 @@ struct AULikedView: View {
     }
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             iconColumn
             descriptiveColumn
                 .frame(maxHeight: 10)
@@ -24,13 +27,14 @@ struct AULikedView: View {
             interactiveColumn
                 .frame(width: 150)
         }
-        .frame(width: 325)
+        .frame(width: maxFrameWidth)
     }
 }
 
 extension AULikedView {
+    
     private var overlayIcon: some View {
-        return AUOverlayIconView(
+        AUOverlayIconView(
             bgRed: 212,
             bgGreen: 4,
             bgBlue: 91,
@@ -39,39 +43,48 @@ extension AULikedView {
     }
     
     private var iconColumn: some View {
-        return ZStack {
-            ProfilePictureView(disableAnimation: true, frameDimension: 40)
-            overlayIcon
-                .offset(x: 15, y: 10)
+        HStack {
+            ZStack {
+                ProfilePictureView(disableAnimation: true, frameDimension: 40)
+                overlayIcon
+                    .offset(x: 15, y: 10)
+            }
+            Spacer()
+                .frame(width: 20)
         }
     }
     
     private var descriptiveColumn: some View {
-        return VStack(alignment: .leading) {
-            HStack {
-                Text(username)
-                    .bold()
-                Text(timeDifference)
-                    .foregroundStyle(.gray)
+        HStack {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text(username)
+                        .bold()
+                    Spacer()
+                    Text(timeDifference)
+                        .foregroundStyle(.gray)
+                }
+                HStack {
+                    Text(likedPostText)
+                        .foregroundStyle(.gray)
+                }
             }
-            HStack {
-                Text(likedPostText)
-                    .foregroundStyle(.gray)
-            }
+            
+            Spacer()
         }
     }
     
     private var interactiveColumn: some View {
-        return HStack {
-            Button(action: {
+        HStack {
+            Button(interactButtonText) {
                 if interactButtonText == "Follow" {
                     self.interactButtonText = "Following"
                 } else if interactButtonText == "Following" {
                     self.interactButtonText = "Follow"
                 }
-            }) {
-                Text(interactButtonText)
             }
+            .buttonStyle(MetaButtonStyle())
+            Spacer()
         }
     }
 }
@@ -80,11 +93,19 @@ extension AULikedView {
     ZStack {
         RoundedRectangle(cornerRadius: 30)
             .backgroundStyle(.black.opacity(0.8))
-        VStack {
-            AULikedView(username: "tgrissom", likedPostText: "Lorem ipsum dolor, shipsum flipsum", timeDifference: "10h")
-                .foregroundColor(.black)
-            AULikedView(username: "randomuser3646", likedPostText: "Lorem ipsum dolor, shipsum flipsum", timeDifference: "10m")
-                .foregroundColor(.black)
+        ScrollView {
+            ForEach(1...3, id: \.self) { n in
+                ForEach(1...10, id: \.self) { i in
+                    AULikedView(
+                        username: MockupUtilities.getMockUsername(),
+                        likedPostText: Lorem.tweet,
+                        timeDifference: MockupUtilities.getMockTimeDifference()
+                    )
+                    .padding(.top, 10)
+                }
+                .frame(width: 800)
+                .foregroundStyle(.black)
+            }
         }
     }
 }
